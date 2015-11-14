@@ -13,6 +13,8 @@
  *  @param {String} [options.placeholder] Any placeholder text
  *  @param {Object} [options.placeholders={}] Options for Q/placeholders, or null to omit it
  *  @param {String} [options.results=''] HTML to display in the results initially. If setting them later, remember to call stateChanged('results')
+ *  @param {Object} [options.begin] method for open filter and start filtering input
+ *  @param {Object} [options.end] method for close filter
  *  @param {Q.Event} [options.onFilter] This event handler is meant to fetch and update results by editing the contents of the element pointed to by the second argument. The first argument is the content of the text input.
  * @return {Q.Tool}
  */
@@ -29,10 +31,11 @@ Q.Tool.define('Q/filter', function (options) {
 		.attr({
 			name: state.name,
 			value: state.value,
-			'class': 'Q_filter_input'
+			'class': 'Q_filter_input',
+			placeholder: state.placeholder
 		}).appendTo(this.element);
 		if (state.placeholders) {
-			tool.$input.plugin('Q/placeholders', state.placeholders || {});
+			tool.$input.plugin('Q/placeholders', state.placeholders);
 		}
 		tool.$results = $('<div class="Q_filter_results" />')
 			.appendTo(this.element);
@@ -109,6 +112,12 @@ Q.Tool.define('Q/filter', function (options) {
 	fullscreen: Q.info.isMobile,
 	onFilter: new Q.Event()
 }, {
+
+	/**
+	 * Begin filter tool action
+	 * @method begin
+	 */
+
 	begin: function () {
 		var tool = this;
 		tool.canceledBlur = true;
@@ -174,6 +183,12 @@ Q.Tool.define('Q/filter', function (options) {
 				: $container.offset().top - $te.offset().top + topH
 		}).show();
 	},
+
+	/**
+	 * End filter tool action
+	 * @method end
+	 */
+
 	end: function () {
 		var tool = this;
 		var state = tool.state;
